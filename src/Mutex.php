@@ -51,12 +51,13 @@ class Mutex
 
     /**
      * @param  int|null $timeout
+     * @param  int|null $ttl
      * @return bool
      */
-    public function acquireLock($timeout = null)
+    public function acquireLock($timeout = null, $ttl = null)
     {
         if ($this->counter > 0 ||
-            $this->lockImplementor->acquireLock($this->name, $timeout)) {
+            $this->lockImplementor->acquireLock($this->name, $timeout, $ttl)) {
             $this->counter++;
 
             return true;
