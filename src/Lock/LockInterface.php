@@ -20,9 +20,10 @@ interface LockInterface
     /**
      * @param  string   $name
      * @param  null|int $timeout
+     * @param  null|int $ttl
      * @return bool
      */
-    public function acquireLock($name, $timeout = null);
+    public function acquireLock($name, $timeout = null, $ttl = null);
 
     /**
      * @param  string $name

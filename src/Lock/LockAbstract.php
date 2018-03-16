@@ -72,15 +72,18 @@ abstract class LockAbstract implements LockInterface
      * @param  null|int $timeout 1. null if you want blocking lock
      *                           2. 0 if you want just lock and go
      *                           3. $timeout > 0 if you want to wait for lock some time (in milliseconds)
+     * @param  null|int $ttl     1. null if you don't want the lock to expire after some time regardless
+     *                              if it was released or not.
+     *                           2. $ttl >= 0 if it should expire after thatmany seconds (only supported by PhpPredisLock)
      * @return bool
      */
-    public function acquireLock($name, $timeout = null)
+    public function acquireLock($name, $timeout = null, $ttl = null)
     {
         $blocking = $timeout === null;
         $start = microtime(true);
         $end = $start + $timeout / 1000;
         $locked = false;
-        while (!(empty($this->locks[$name]) && $locked = $this->getLock($name, $blocking)) && ($blocking || ($timeout > 0 && microtime(true) < $end))) {
+        while (!(empty($this->locks[$name]) && $locked = $this->getLock($name, $blocking, $ttl)) && ($blocking || ($timeout > 0 && microtime(true) < $end))) {
             usleep(static::USLEEP_TIME);
         }
 
@@ -97,9 +100,12 @@ abstract class LockAbstract implements LockInterface
      * @param  string $name
      * @param  bool   $blocking If lock provider supports blocking then you can pass this param through,
      *                          otherwise, ignore this variable, default blocking method will be used.
+     * @param  null|int $ttl    1. null if you don't want the lock to expire after some time regardless
+     *                             if it was released or not.
+     *                          2. $ttl >= 0 if it should expire after thatmany seconds (only supported by PhpPredisLock)
      * @return bool
      */
-    abstract protected function getLock($name, $blocking);
+    abstract protected function getLock($name, $blocking, $ttl = null);
 
     /**
      * Information returned by this method allow to track down process which acquired lock
