@@ -32,6 +32,11 @@ abstract class LockAbstract implements LockInterface
      */
     protected $locks = array();
 
+    /**
+     * @var array
+     */
+    protected $ttl = array();
+
     public function __construct(LockInformationProviderInterface $informationProvider = null)
     {
         $this->lockInformationProvider = $informationProvider ? : new BasicLockInformationProvider();
@@ -56,7 +61,7 @@ abstract class LockAbstract implements LockInterface
     {
         foreach ($this->locks as $name => $v) {
             $released = $this->releaseLock($name);
-            if (!$released) {
+            if (!$released && (!is_int($v) || time() <= $v + $this->ttl[$name])) {
                 throw new UnrecoverableMutexException(sprintf(
                     'Cannot release lock in __destruct(): %s',
                     $name
@@ -88,7 +93,8 @@ abstract class LockAbstract implements LockInterface
         }
 
         if ($locked) {
-            $this->locks[$name] = true;
+            $this->ttl[$name] = $ttl;
+            $this->locks[$name] = $ttl !== null ? time() : true;
 
             return true;
         }

@@ -38,11 +38,15 @@ class PhpRedisLock extends LockAbstract
     /**
      * @param  string $name
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
-        if (!$this->client->setnx($name, serialize($this->getLockInformation()))) {
+        if (
+            $ttl !== null && !$this->client->set($name, serialize($this->getLockInformation()), array('nx', 'ex' => $ttl)
+            || !$this->client->setnx($name, serialize($this->getLockInformation())))
+        ) {
             return false;
         }
 
@@ -57,8 +61,16 @@ class PhpRedisLock extends LockAbstract
      */
     public function releaseLock($name)
     {
-        if (isset($this->locks[$name]) && $this->client->del($name)) {
+        if (
+            isset($this->locks[$name])
+            && (
+                $this->client->del($name)
+                || is_int($this->locks[$name])
+                    && time() > $this->locks[$name] + $this->ttl[$name]
+            )
+        ) {
             unset($this->locks[$name]);
+            unset($this->ttl[$name]);
 
             return true;
         }
