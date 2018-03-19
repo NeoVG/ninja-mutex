@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NinjaMutex\Lock;
 
 use Predis;
@@ -37,34 +36,23 @@ class PredisRedisLock extends LockAbstract
     }
 
     /**
-     * @param  string   $name
-     * @param  bool     $blocking
-     * @param  null|int $ttl
-     *
+     * @param  string $name
+     * @param  bool   $blocking
      * @return bool
      */
-    protected function getLock($name, $blocking, $ttl = null)
+    protected function getLock($name, $blocking)
     {
-        if ($ttl === null) {
-            if (!$this->client->setnx($name, serialize($this->getLockInformation()))) {
-                return false;
-            }
-
-            return true;
-        } else {
-            if (!$this->client->set($name, serialize($this->getLockInformation()), array('nx', 'ex' => $ttl))) {
-                return false;
-            }
-
-            return true;
+        if (!$this->client->setnx($name, serialize($this->getLockInformation()))) {
+            return false;
         }
+
+        return true;
     }
 
     /**
      * Release lock
      *
      * @param  string $name name of lock
-     *
      * @return bool
      */
     public function releaseLock($name)
@@ -82,7 +70,6 @@ class PredisRedisLock extends LockAbstract
      * Check if lock is locked
      *
      * @param  string $name name of lock
-     *
      * @return bool
      */
     public function isLocked($name)
