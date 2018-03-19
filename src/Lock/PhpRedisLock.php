@@ -43,14 +43,11 @@ class PhpRedisLock extends LockAbstract
      */
     protected function getLock($name, $blocking, $ttl = null)
     {
-        if (
-            $ttl !== null && !$this->client->set($name, serialize($this->getLockInformation()), array('nx', 'ex' => $ttl)
-            || !$this->client->setnx($name, serialize($this->getLockInformation())))
-        ) {
-            return false;
+        if ($ttl !== null) {
+            return $this->client->set($name, serialize($this->getLockInformation()), array('nx', 'ex' => $ttl));
+        } else {
+            return $this->client->setnx($name, serialize($this->getLockInformation()));
         }
-
-        return true;
     }
 
     /**
