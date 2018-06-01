@@ -31,9 +31,10 @@ class DirectoryLock extends LockAbstract
     /**
      * @param  string $name
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
         return @mkdir($this->getDirectoryPath($name));
     }

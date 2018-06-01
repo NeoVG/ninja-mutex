@@ -96,9 +96,10 @@ class MySQLPDOLock extends LockAbstract
     /**
      * @param  string $name
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
         return !$this->isLocked($name) && $this->pdo[$name]->query(
             sprintf(

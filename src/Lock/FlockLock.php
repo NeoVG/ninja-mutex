@@ -32,9 +32,10 @@ class FlockLock extends LockAbstract
     /**
      * @param  string $name
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
         if (!$this->setupFileHandle($name)) {
             return false;

@@ -38,9 +38,10 @@ class PredisRedisLock extends LockAbstract
     /**
      * @param  string $name
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
         if (!$this->client->setnx($name, serialize($this->getLockInformation()))) {
             return false;

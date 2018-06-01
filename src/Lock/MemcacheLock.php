@@ -81,9 +81,10 @@ class MemcacheLock extends LockAbstract implements LockExpirationInterface
     /**
      * @param  string $name name of lock
      * @param  bool   $blocking
+     * @param  null|int $ttl
      * @return bool
      */
-    protected function getLock($name, $blocking)
+    protected function getLock($name, $blocking, $ttl = null)
     {
         if (!$this->memcache->add($name, serialize($this->getLockInformation()), 0, $this->expiration)) {
             return false;
